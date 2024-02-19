@@ -32,7 +32,9 @@ export class HighlightsItemView extends ItemView {
 			this.contentEl.empty();
 
 			highlights.forEach(({ id, text }) => {
-				const div = this.contentEl.createDiv({ cls: 'highlight', text: text });
+				const div = this.contentEl.createDiv(
+					{ cls: 'highlight', text: text }
+				);
 				div.addEventListener('click', () => {
 					this.scrollToHighlight(id);
 				});

@@ -1,17 +1,18 @@
 .highlights-list .highlight {
 	cursor: var(--cursor);
 	position: relative;
-	padding: var(--size-4-2) var(--size-4-5) var(--size-4-2) var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3) var(--size-4-2) var(--size-4-3);
 	white-space: pre-wrap;
 	width: 100%;
-	font-size: var(--font-ui-smaller);
+	font-size: var(--font-ui-small);
 	line-height: var(--line-height-tight);
 	background-color: var(--search-result-background);
-	border: 1px solid var(--background-modifier-border);
+	border-left: 5px solid var(--text-highlight-bg);
 	border-radius: var(--radius-s);
 	overflow: hidden;
 	margin: 0 0 var(--size-4-2);
-	color: var(--text-muted);
+	color: var(--text-normal);
+	box-shadow: 0 0 0 1px var(--background-modifier-border);
 }
 
 .highlights-list .highlight:hover {
