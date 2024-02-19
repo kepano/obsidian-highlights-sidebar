@@ -1,60 +1,122 @@
 import { 
-	App, 
-	Plugin, 
-	PluginSettingTab,
-	Setting,
+	App,
+	debounce,
+	Events,
+	MarkdownView,
+	Menu,
+	Plugin,
+	setIcon,
 	View,
 	WorkspaceLeaf
 } from 'obsidian';
 
-interface HighlightsSidebarSettings {
+import { HighlightsItemView, viewType } from 'src/view';
+
+interface HighlightsViewSettings {
 }
 
-const DEFAULT_SETTINGS: HighlightsSidebarSettings = {
+const DEFAULT_SETTINGS: HighlightsViewSettings = {
 }
 
-import HighlightsView from 'view/view';
-import { HIGHLIGHTS_VIEW_TYPE } from './constants';
-
-export default class HighlightsSidebar extends Plugin {
-	settings: HighlightsSidebarSettings;
-	public view: HighlightsView;
+export default class HighlightsView extends Plugin {
+	settings: HighlightsViewSettings;
 
 	async onload() {
+		const { app } = this;
+		this.initLeaf();
+
 		await this.loadSettings();
 
 		this.registerView(
-			HIGHLIGHTS_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => this.createHighlightsView(leaf)
+			viewType,
+			(leaf: WorkspaceLeaf) => new HighlightsItemView(leaf, this)
 		);
 
 		this.addCommand({
 			id: 'open-highlights-view',
 			name: 'Open highlights view',
 			callback: () => {
-				this.showSidebar();
+				this.initLeaf();
 			}
 		});
 
-
 		this.addRibbonIcon('highlighter', 'Show Highlights', () => {
-			this.showSidebar();
+			this.initLeaf();
 		});
+
+		this.registerEvent(
+			app.metadataCache.on(
+				'changed',
+				debounce(
+					async (file) => {
+						const activeView = app.workspace.getActiveViewOfType(MarkdownView);
+						if (activeView && file === activeView.file) {
+							this.processHighlights();
+						}
+					},
+					100,
+					true
+				)
+			)
+		);
+
+		this.registerEvent(
+			app.workspace.on(
+				'active-leaf-change',
+				debounce(
+					async (leaf) => {
+						app.workspace.iterateRootLeaves((rootLeaf) => {
+							if (rootLeaf === leaf) {
+								if (leaf.view instanceof MarkdownView) {
+									this.processHighlights();
+								} else {
+									this.view?.setNoContentMessage();
+								}
+							}
+						});
+					},
+					100,
+					true
+				)
+			)
+		);
+
+		(async () => {
+			this.processHighlights();
+		})();
 	}
 
 	onunload() {
 		this.app.workspace
-			.getLeavesOfType(HIGHLIGHTS_VIEW_TYPE)
+			.getLeavesOfType(viewType)
 			.forEach((leaf) => leaf.detach());
 	}
 
-	showSidebar() {
-		this.app.workspace
-			.getRightLeaf(true)
-			.setViewState({ type: HIGHLIGHTS_VIEW_TYPE });
+	get view() {
+		const leaves = this.app.workspace.getLeavesOfType(viewType);
+		if (!leaves?.length) return null;
+		return leaves[0].view as HighlightsView;
 	}
 
-	createHighlightsView(leaf: WorkspaceLeaf) {
+	async initLeaf() {
+		if (this.view) return this.revealLeaf();
+
+		await this.app.workspace.getRightLeaf(false).setViewState({
+			type: viewType,
+		});
+
+		this.revealLeaf();
+
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (activeView) {
+			this.processHighlights();
+		}
+	}
+
+	revealLeaf() {
+		const leaves = this.app.workspace.getLeavesOfType(viewType);
+		if (!leaves?.length) return;
+		this.app.workspace.revealLeaf(leaves[0]);
 	}
 
 	async loadSettings() {
@@ -64,4 +126,22 @@ export default class HighlightsSidebar extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	processHighlights = async () => {
+		const { settings, view } = this;
+
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+		if (activeView) {
+			try {
+				const fileContent = await this.app.vault.cachedRead(activeView.file);
+				view?.setViewContent(bib);
+			} catch (e) {
+				console.error(e);
+			}
+		} else {
+			view?.setNoContentMessage();
+		}
+	};
+
 }
