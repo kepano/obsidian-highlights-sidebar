@@ -1,8 +1,20 @@
-/*
+.highlights-list .highlight {
+	cursor: var(--cursor);
+	position: relative;
+	padding: var(--size-4-2) var(--size-4-5) var(--size-4-2) var(--size-4-3);
+	white-space: pre-wrap;
+	width: 100%;
+	font-size: var(--font-ui-smaller);
+	line-height: var(--line-height-tight);
+	background-color: var(--search-result-background);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	overflow: hidden;
+	margin: 0 0 var(--size-4-2);
+	color: var(--text-muted);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.highlights-list .highlight:hover {
+	color: var(--text-normal);
+	background-color: var(--text-selection);
+}

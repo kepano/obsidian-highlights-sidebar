@@ -40,10 +40,6 @@ export default class HighlightsView extends Plugin {
 			}
 		});
 
-		this.addRibbonIcon('highlighter', 'Show Highlights', () => {
-			this.initLeaf();
-		});
-
 		this.registerEvent(
 			app.metadataCache.on(
 				'changed',
@@ -133,12 +129,7 @@ export default class HighlightsView extends Plugin {
 		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 
 		if (activeView) {
-			try {
-				const fileContent = await this.app.vault.cachedRead(activeView.file);
-				view?.setViewContent(bib);
-			} catch (e) {
-				console.error(e);
-			}
+			view?.setViewContent();
 		} else {
 			view?.setNoContentMessage();
 		}

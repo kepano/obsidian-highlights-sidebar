@@ -32,7 +32,7 @@ export class HighlightsItemView extends ItemView {
 			this.contentEl.empty();
 
 			highlights.forEach(({ id, text }) => {
-				const div = this.contentEl.createDiv({ cls: 'search-result-file-match', text: text });
+				const div = this.contentEl.createDiv({ cls: 'highlight', text: text });
 				div.addEventListener('click', () => {
 					this.scrollToHighlight(id);
 				});
@@ -46,13 +46,7 @@ export class HighlightsItemView extends ItemView {
 		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!activeView) return;
 
-		// todo
-	}
-
-	displayHighlights(highlights: string) {	
-		this.contentEl.empty();
-		const div = this.contentEl.createDiv();
-		div.createEl('div').textContent = highlights;
+		// todo: click to scroll to document position
 	}
 
 	setNoContentMessage() {
