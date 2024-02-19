@@ -67,17 +67,16 @@ export class HighlightsItemView extends ItemView {
 		});
 	}
 
-	// view.ts, inside HighlightsItemView
 	getViewType(): string {
 		return viewType;
 	}
 
 	getDisplayText(): string {
-		return "Highlights"; // Adjust the return value as needed
+		return "Highlights";
 	}
 
 	getIcon(): string {
-		return 'highlighter'; // Make sure this icon exists or is correctly referenced
+		return 'highlighter';
 	}
 
 
